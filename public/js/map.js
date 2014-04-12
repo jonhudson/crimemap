@@ -2,28 +2,33 @@ $(document).ready(function() {
 
     var map;
     var markers = [];
+    var lat;
+    var long;
     
+    // Set up the map, centered on London baby, yeah!
     function initialize() {       
         var mapOptions = {
-            center: new google.maps.LatLng(51.702551,0.110461),
-            zoom: 5
-        };
-        
-        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-        
-        
+            center: new google.maps.LatLng(51.508515,-0.12548719999995228),
+            zoom: 15
+        };        
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);       
     }
     
+    google.maps.event.addDomListener(window, 'load', initialize);
     
+    // On submission of a location, re-center the map and get crime data
     $('#location').submit(function(event) {
         event.preventDefault();
         var geocoder = new google.maps.Geocoder();
         var location = $(this).find('input').val();
-        geocoder.geocode({ 'address' : location }, function(results, status) {
-           map.setCenter(results[0].geometry.location);
-        });
         
-        $.get('/get-crimes/all-crime', function(data) {
+        geocoder.geocode({ 'address' : location, 'componentRestrictions': {'country' : 'gb'} }, function(results, status) {
+           map.setCenter(results[0].geometry.location);
+           lat = results[0].geometry.location.lat();
+           long = results[0].geometry.location.lng();
+        });
+        var data = { 'catUrl': 'all-crimes', 'lat': lat, 'long': long };
+        $.get('/get-crimes', data, function(data) {
             for (var i = 0; i < data.length; i++) {            
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
@@ -36,10 +41,13 @@ $(document).ready(function() {
         
     });
     
+    // Get new crime data when crime category is changed
     $('#category').change(function() {
         clearMap();
         var catUrl = $(this).val();
-        $.get('/get-crimes/' + catUrl, function(data) {
+        var data = { 'catUrl': catUrl, 'lat': lat, 'long': long };
+        
+        $.get('/get-crimes', data, function(data) {
             for (var i = 0; i < data.length; i++) {            
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
@@ -51,18 +59,12 @@ $(document).ready(function() {
         });
     });
     
-    google.maps.event.addDomListener(window, 'load', initialize);
-    
-    function setMarkers(map)
-    {
-        for (var i=0; i<markers.length; i++) {
-            markers[i].setMap(map);
-        }
-    }
-    
+      
     function clearMap()
     {
-        setMarkers(null);
+        for (var i=0; i<markers.length; i++) {
+            markers[i].setMap(null);
+        }
         markers = [];
     }
     
