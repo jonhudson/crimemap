@@ -22,23 +22,25 @@ $(document).ready(function() {
         var geocoder = new google.maps.Geocoder();
         var location = $(this).find('input').val();
         
-        geocoder.geocode({ 'address' : location, 'componentRestrictions': {'country' : 'gb'} }, function(results, status) {
-           map.setCenter(results[0].geometry.location);
+        geocoder.geocode({ 'address' : location, 'componentRestrictions': {'country' : 'gb'} }, function(results, status) {            
            lat = results[0].geometry.location.lat();
            long = results[0].geometry.location.lng();
-        });
-        var data = { 'catUrl': 'all-crimes', 'lat': lat, 'long': long };
-        $.get('/get-crimes', data, function(data) {
-            for (var i = 0; i < data.length; i++) {            
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
-                    map: map,
-                    title: data[i].category
-                });
-                markers.push(marker);
-            }
-        }); 
+           map.setCenter(results[0].geometry.location);
+           
+           var data = { 'catUrl': 'all-crime', 'lat': lat, 'long': long };
         
+            $.get('/get-crimes', data, function(data) {
+                for (var i = 0; i < data.length; i++) {            
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
+                        map: map,
+                        title: data[i].category
+                    });
+                    markers.push(marker);
+                }
+            }); 
+        
+        });        
     });
     
     // Get new crime data when crime category is changed
