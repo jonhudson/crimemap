@@ -17,7 +17,7 @@ $(document).ready(function() {
     google.maps.event.addDomListener(window, 'load', initialize);
     
     // On submission of a location, re-center the map and get crime data
-    $('#location').submit(function(event) {
+    $('#location-form').submit(function(event) {
         event.preventDefault();
         var geocoder = new google.maps.Geocoder();
         var location = $(this).find('input').val();
