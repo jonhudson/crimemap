@@ -4,8 +4,9 @@ $(document).ready(function() {
     var markers = [];
     var lat;
     var long;
+    var categorySelect = $('#category');
     
-    // Set up the map, centered on London baby, yeah!
+    // Set up the map, centered on London
     function initialize() {       
         var mapOptions = {
             center: new google.maps.LatLng(51.508515,-0.12548719999995228),
@@ -16,61 +17,57 @@ $(document).ready(function() {
     
     google.maps.event.addDomListener(window, 'load', initialize);
     
-    // On submission of a location, re-center the map and get crime data
-    $('#location-form').submit(function(event) {
+    
+
+    $('#crimeform').submit(function(event) {
         event.preventDefault();
         var geocoder = new google.maps.Geocoder();
-        var location = $(this).find('input').val();
+        var location = $(this).find('#location').val();
+        var catUrl = $(this).find('#category').val();
+        var year = $(this).find('#year').val();
         
         geocoder.geocode({ 'address' : location, 'componentRestrictions': {'country' : 'gb'} }, function(results, status) {            
-           lat = results[0].geometry.location.lat();
-           long = results[0].geometry.location.lng();
-           map.setCenter(results[0].geometry.location);
+            lat = results[0].geometry.location.lat();
+            long = results[0].geometry.location.lng();
+            map.setCenter(results[0].geometry.location);
            
-           var data = { 'catUrl': 'all-crime', 'lat': lat, 'long': long };
-        
+            var data = { 'catUrl': catUrl, 'lat': lat, 'long': long, 'year': year };
+            var heatmapData = [];
             $.get('/get-crimes', data, function(data) {
-                for (var i = 0; i < data.length; i++) {            
-                    var marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
-                        map: map,
-                        title: data[i].category
-                    });
-                    markers.push(marker);
-                }
+                if (data) {
+                    for (var i = 0; i < data.length; i++) {                          
+                        heatmapData[i] = new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude);                      
+                    }
+                    
+                    var heatmap = new google.maps.visualization.HeatmapLayer({data: heatmapData});
+                    var gradient = [
+                        'rgba(0, 255, 255, 0)',
+                        'rgba(0, 255, 255, 1)',
+                        'rgba(0, 191, 255, 1)',
+                        'rgba(0, 127, 255, 1)',
+                        'rgba(0, 63, 255, 1)',
+                        'rgba(0, 0, 255, 1)',
+                        'rgba(0, 0, 223, 1)',
+                        'rgba(0, 0, 191, 1)',
+                        'rgba(0, 0, 159, 1)',
+                        'rgba(0, 0, 127, 1)',
+                        'rgba(63, 0, 91, 1)',
+                        'rgba(127, 0, 63, 1)',
+                        'rgba(191, 0, 31, 1)',
+                        'rgba(255, 0, 0, 1)'
+                      ];
+                    heatmap.set('gradient', gradient);
+                    heatmap.set('radius', 40);
+                    heatmap.setMap(null);
+                    heatmap.setMap(map);
+                    
+                } else {
+                    // do something here, innit
+                }                
             }); 
         
         });        
     });
-    
-    // Get new crime data when crime category is changed
-    $('#category').change(function() {
-        clearMap();
-        var catUrl = $(this).val();
-        var data = { 'catUrl': catUrl, 'lat': lat, 'long': long };
-        
-        $.get('/get-crimes', data, function(data) {
-            for (var i = 0; i < data.length; i++) {            
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude),
-                    map: map,
-                    title: data[i].category
-                });
-                markers.push(marker);
-            }
-        });
-    });
-    
-      
-    function clearMap()
-    {
-        for (var i=0; i<markers.length; i++) {
-            markers[i].setMap(null);
-        }
-        markers = [];
-    }
-    
-    
 });
 
     
