@@ -1,15 +1,20 @@
 <?php
-session_cache_limiter(false);
-session_start();
 
 require '../vendor/autoload.php';
 
+use CrimeMap\lib\Database;
+use CrimeMap\Config;
+
 $app = new Slim\Slim(array(
     'debug' => true,
-    'templates.path' => '../src/templates'
+    'templates.path' => '../src/CrimeMap/templates'
 ));
 
-require '../src/routes/routes.php';
+$app->container->singleton('db', function () {
+    return new Database(Config::DB_HOST, Config::DB_NAME, Config::DB_USERNAME, Config::DB_PASSWORD);
+});
+
+require '../src/CrimeMap/routes/routes.php';
 
 $app->run();
 

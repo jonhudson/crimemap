@@ -4,6 +4,6 @@
     }, 
     
     "autoload": {
-        "psr-0": {"CrimeMap\\": "src/"}
+        "psr-4": {"CrimeMap\\": "src/"}
     }
 }
