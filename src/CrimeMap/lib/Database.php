@@ -5,15 +5,15 @@ namespace CrimeMap\lib;
 class Database Extends \PDO 
 {
     public function __construct($host, $name, $username, $password)
-	{
-		$dsn = 'mysql:dbname=' . $name . ';host=' . $host;
+    {
+        $dsn = 'mysql:dbname=' . $name . ';host=' . $host;
 
-		try {
-			parent::__construct($dsn, $username, $password);
-		} catch (PDOException $e) {
-			die('Could not connect to database' . $e);
-		}
-	}
+        try {
+            parent::__construct($dsn, $username, $password);
+        } catch (PDOException $e) {
+            die('Could not connect to database' . $e);
+        }
+    }   
     
     
     /**

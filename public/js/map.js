@@ -36,7 +36,7 @@ $(document).ready(function() {
             $.get('/get-crimes', data, function(data) {
                 if (data) {
                     for (var i = 0; i < data.length; i++) {                          
-                        heatmapData[i] = new google.maps.LatLng(data[i].location.latitude, data[i].location.longitude);                      
+                        heatmapData[i] = new google.maps.LatLng(data[i].lat, data[i].lng);                      
                     }
                     
                     var heatmap = new google.maps.visualization.HeatmapLayer({data: heatmapData});

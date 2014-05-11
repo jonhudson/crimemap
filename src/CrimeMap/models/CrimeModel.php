@@ -20,11 +20,15 @@ class CrimeModel
      */
     public function getCrimesInBatches($limit, $fromId)
     {
-        $sql = 'SELECT * FROM crimes WHERE id >= :fromId LIMIT :limit';
+        $sql = 'SELECT * FROM crime WHERE id >= :fromId LIMIT :limit';
         $params = array(':fromId' => $fromId, ':limit' => $limit);        
         $data = $this->db->fetchAll($sql, $params);
         $lastElem = $data[count($data) - 1];
         
-        return array($lastElem['id'] + 1, $data);
+        if (!empty($data)) {
+            return array('nextId' => $lastElem['id'] + 1, 'crimeData' => $data);
+        }
+        
+        return false;        
     }
 }
