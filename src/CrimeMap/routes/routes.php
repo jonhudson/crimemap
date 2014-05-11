@@ -20,18 +20,14 @@ $app->get('/get-crimes', function() use($app) {
         
         $validCrimes = array();
         $id = 1;
-        while ($returnedData = $app->crimeModel->getCrimesInBatches(2000, $id)) {
+        while ($returnedData = $app->crimeModel->getCrimesInBatches(50000, $id)) {
             foreach ($returnedData['crimeData'] as $crime) {
                 if ($app->haversine->getDistanceInMiles($lat, $long, $crime['lat'], $crime['lng']) <= 5) {
                     $validCrimes[] = $crime;
                 }
             }
             $id = $returnedData['nextId'];
-        }
-        
-        
-        
-        
+        }       
               
         $app->response->headers->set('Content-Type', 'application/json');
         $app->response->setBody(json_encode($validCrimes));

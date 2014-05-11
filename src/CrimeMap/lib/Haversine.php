@@ -7,10 +7,10 @@ class Haversine
     
     public function getDistanceInMiles($latFrom, $lngFrom, $latTo, $lngTo)
     {
-        $latFrom = deg2rad($latFrom);
-        $lngFrom = deg2rad($lngFrom);
-        $latTo = deg2rad($latTo);
-        $lngTo = deg2rad($lngTo);
+        $latFrom = deg2rad( (double) $latFrom);
+        $lngFrom = deg2rad( (double) $lngFrom);
+        $latTo = deg2rad( (double) $latTo);
+        $lngTo = deg2rad( (double) $lngTo);
         
         $latDelta = $latTo - $latFrom;
         $lngDelta = $lngTo - $lngFrom;
