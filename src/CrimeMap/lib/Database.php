@@ -15,6 +15,16 @@ class Database Extends \PDO
 		}
 	}
     
+    
+    /**
+     * Fetch a row
+     * 
+     * @param string $sql
+     * @param array $params
+     * 
+     * @return array
+     * @throws \Exception
+     */
     public function fetch($sql, Array $params)
     {
         $stmt = $this->prepare($sql);        
@@ -29,6 +39,16 @@ class Database Extends \PDO
         }
     }
     
+    
+    /**
+     * Fetch all rows
+     * 
+     * @param string  $sql
+     * @param array $params
+     * 
+     * @return array
+     * @throws \Exception
+     */
     public function fetchAll($sql, Array $params)
     {
         $stmt = $this->prepare($sql);        
