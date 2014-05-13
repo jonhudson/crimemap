@@ -3,7 +3,6 @@
 require '../vendor/autoload.php';
 
 use CrimeMap\lib\Database;
-use CrimeMap\lib\Haversine;
 use CrimeMap\Config;
 use CrimeMap\models\CrimeModel;
 
@@ -22,11 +21,6 @@ $app->container->singleton('db', function () {
 $app->crimeModel = function() use ($app) {
     return new CrimeModel($app->db);
 };
-
-$app->haversine = function() {
-    return new Haversine();
-};
-
 
 // Get routes
 require '../src/CrimeMap/routes/routes.php';

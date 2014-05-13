@@ -13,33 +13,39 @@ $(document).ready(function() {
             zoom: 15
         };        
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);       
-    }
-    
+    }    
     google.maps.event.addDomListener(window, 'load', initialize);
     
-    
-
+    var heatmap;
     $('#crimeform').submit(function(event) {
         event.preventDefault();
         var geocoder = new google.maps.Geocoder();
         var location = $(this).find('#location').val();
-        var catUrl = $(this).find('#category').val();
-        var year = $(this).find('#year').val();
+        var category = $(this).find('#category').val();        
         
+        if (heatmap) {
+            heatmap.setMap(null);
+        }        
+
         geocoder.geocode({ 'address' : location, 'componentRestrictions': {'country' : 'gb'} }, function(results, status) {            
             lat = results[0].geometry.location.lat();
             long = results[0].geometry.location.lng();
             map.setCenter(results[0].geometry.location);
            
-            var data = { 'catUrl': catUrl, 'lat': lat, 'long': long, 'year': year };
+            var data = { 'category': category, 'lat': lat, 'long': long };
             var heatmapData = [];
-            $.get('/get-crimes', data, function(data) {
+            if (category == 'All crime') {
+                var uri = '/crimes/' + encodeURIComponent(lat) + '/' + encodeURIComponent(long);
+            } else {
+                var uri = '/crimes/' + encodeURIComponent(category) + '/'  + encodeURIComponent(lat) + '/' + encodeURIComponent(long);
+            }
+            $.get(uri, function(data) {
                 if (data) {
                     for (var i = 0; i < data.length; i++) {                          
                         heatmapData[i] = new google.maps.LatLng(data[i].lat, data[i].lng);                      
                     }
                     
-                    var heatmap = new google.maps.visualization.HeatmapLayer({data: heatmapData});
+                    heatmap = new google.maps.visualization.HeatmapLayer({data: heatmapData});
                     var gradient = [
                         'rgba(0, 255, 255, 0)',
                         'rgba(0, 255, 255, 1)',
@@ -58,7 +64,6 @@ $(document).ready(function() {
                       ];
                     heatmap.set('gradient', gradient);
                     heatmap.set('radius', 40);
-                    heatmap.setMap(null);
                     heatmap.setMap(map);
                     
                 } else {

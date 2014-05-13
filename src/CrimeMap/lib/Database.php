@@ -25,7 +25,7 @@ class Database Extends \PDO
      * @return array
      * @throws \Exception
      */
-    public function fetch($sql, Array $params)
+    public function fetch($sql, $params = array())
     {
         $stmt = $this->prepare($sql);          
         $keysAndVals = array();
@@ -60,7 +60,7 @@ class Database Extends \PDO
      * @return array
      * @throws \Exception
      */
-    public function fetchAll($sql, Array $params)
+    public function fetchAll($sql, $params = array())
     {
         $stmt = $this->prepare($sql);  
         $keysAndVals = array();

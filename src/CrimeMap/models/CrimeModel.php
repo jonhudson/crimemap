@@ -1,4 +1,5 @@
 <?php
+
 namespace CrimeMap\models;
 
 class CrimeModel 
@@ -11,24 +12,61 @@ class CrimeModel
     }
     
     /**
-     * Gets $limit records from db starting from $fromId
+     * Fetches crimes within 1 mile of user's latitude and longitude
      * 
-     * @param int $limit
-     * @param int $fromId
+     * @param double $userLat
+     * @param double $userLng
      * 
-     * @return array The first element contains last id plus one, second element contains data
+     * @return array The crime data
      */
-    public function getCrimesInBatches($limit, $fromId)
+    public function getCrimes($userLat, $userLng)
     {
-        $sql = 'SELECT * FROM crime WHERE id >= :fromId LIMIT :limit';
-        $params = array(':fromId' => $fromId, ':limit' => $limit);        
-        $data = $this->db->fetchAll($sql, $params);
-        $lastElem = $data[count($data) - 1];
+        $sql = 'SELECT *, ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
+                AS distance 
+                FROM crime 
+                HAVING distance <= 1';
         
-        if (!empty($data)) {
-            return array('nextId' => $lastElem['id'] + 1, 'crimeData' => $data);
-        }
+        $params = array(':userLat' => $userLat, ':userLng' => $userLng);        
         
-        return false;        
+        return $this->db->fetchAll($sql, $params);
+               
     }
+    
+    /**
+     * Fetches crimes within 1 mile of user's latitude and longitude
+     * that are of type $category
+     * 
+     * @param string $category
+     * @param double $userLat
+     * @param double $userLng
+     * 
+     * @return array The crime data
+     */
+    public function getCrimesInCategory($category, $userLat, $userLng)
+    {
+        $sql = 'SELECT *, ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
+                AS distance 
+                FROM crime 
+                HAVING distance <= 1
+                WHERE crime = :category';
+        
+        $params = array(
+            ':userLat' => $userLat, 
+            ':userLng' => $userLng,
+            ':category' => $category
+        );        
+        
+        return $this->db->fetchAll($sql, $params);
+    }
+    
+    
+    public function getCategories()
+    {
+        $sql = 'SELECT DISTINCT crime 
+                FROM crime
+                ORDER BY crime ASC';
+        
+        return $this->db->fetchAll($sql);
+    }
+    
 }

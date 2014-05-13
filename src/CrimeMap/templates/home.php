@@ -18,20 +18,11 @@
                         <div class="form-group">
                             <label for="category">Choose crime category:</label>
                             <select id="category" name="category" class="form-control">
-                                <?php foreach($cats as $cat): ?>                    
-                                    <option value="<?php echo $cat->url; ?>"><?php echo $cat->name; ?></option>
+                                <?php foreach($categories as $cat): ?>                    
+                                    <option value="<?php echo htmlentities($cat['crime']); ?>"><?php echo htmlentities($cat['crime']); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>  
-                        <div class="form-group">
-                            <label for="year">Year:</label>
-                            <select id="year" name="year" class="form-control">  
-                                <?php $diff = date('Y') - 2011; $date = date('Y'); ?>
-                                <?php for ($diff; $diff > 0; $diff--): ?>                  
-                                <option value="<?php echo $date - $diff; ?>"><?php echo $date - $diff; ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>                      
+                        </div> 
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>                    
                 </div>
