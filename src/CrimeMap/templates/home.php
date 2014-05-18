@@ -19,7 +19,7 @@
                             <label for="category">Choose crime category:</label>
                             <select id="category" name="category" class="form-control">
                                 <?php foreach($categories as $cat): ?>                    
-                                    <option value="<?php echo htmlentities($cat['crime']); ?>"><?php echo htmlentities($cat['crime']); ?></option>
+                                    <option value="<?php echo htmlentities(trim($cat['crime_type'])); ?>"><?php echo htmlentities($cat['crime_type']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div> 

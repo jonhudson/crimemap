@@ -47,13 +47,13 @@ class CrimeModel
         $sql = 'SELECT *, ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
                 AS distance 
                 FROM crime 
-                HAVING distance <= 1
-                WHERE crime = :category';
+                WHERE crime_type like :category
+                HAVING distance <= 1';               
         
         $params = array(
             ':userLat' => $userLat, 
             ':userLng' => $userLng,
-            ':category' => $category
+            ':category' => '%' . $category . '%'
         );        
         
         return $this->db->fetchAll($sql, $params);
@@ -62,9 +62,9 @@ class CrimeModel
     
     public function getCategories()
     {
-        $sql = 'SELECT DISTINCT crime 
+        $sql = 'SELECT DISTINCT crime_type 
                 FROM crime
-                ORDER BY crime ASC';
+                ORDER BY crime_type ASC';
         
         return $this->db->fetchAll($sql);
     }

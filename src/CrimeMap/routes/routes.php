@@ -2,7 +2,7 @@
 
 $app->get('/', function() use($app) {    
     $categories = $app->crimeModel->getCategories();
-    array_unshift($categories, array('crime' => 'All crime'));
+    array_unshift($categories, array('crime_type' => 'All crime'));
     
     $app->render('home.php', array('categories' => $categories));
 });

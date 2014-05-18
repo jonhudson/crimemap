@@ -27,20 +27,10 @@ class Database Extends \PDO
      */
     public function fetch($sql, $params = array())
     {
-        $stmt = $this->prepare($sql);          
-        $keysAndVals = array();
-        
-        foreach ($params as $key => $val) {
-            $pdoType = gettype($val) == 'integer' ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-            $keysAndVals[] = array('key' => $key, 'val' => $val, 'type' => $pdoType);
-        }
-        
-        foreach ($keysAndVals as $elem) {            
-            $stmt->bindParam($elem['key'], $elem['val'], $elem['type']);
-        }
+        $stmt = $this->prepare($sql);       
         
         if ($stmt) {            
-            $result = $stmt->execute();             
+            $result = $stmt->execute($params);             
             if ($result) {
                 return $stmt->fetch(\PDO::FETCH_ASSOC); 
             } else {
@@ -62,20 +52,10 @@ class Database Extends \PDO
      */
     public function fetchAll($sql, $params = array())
     {
-        $stmt = $this->prepare($sql);  
-        $keysAndVals = array();
-        
-        foreach ($params as $key => $val) {
-            $pdoType = gettype($val) == 'integer' ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-            $keysAndVals[] = array('key' => $key, 'val' => $val, 'type' => $pdoType);
-        }
-        
-        foreach ($keysAndVals as $elem) {            
-            $stmt->bindParam($elem['key'], $elem['val'], $elem['type']);
-        }
+        $stmt = $this->prepare($sql); 
         
         if ($stmt) {            
-            $result = $stmt->execute();             
+            $result = $stmt->execute($params);             
             if ($result) {
                 return $stmt->fetchAll(\PDO::FETCH_ASSOC); 
             } else {
