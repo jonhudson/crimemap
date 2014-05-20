@@ -17,7 +17,9 @@
     </form>                    
 </div>
 <div class="col-xs-9 height-100">
-    <div id="map-canvas" class="height-100"></div>
+    <div id="graph-container" class="height-100">
+        <canvas id="line-chart" width="400" height="400"></canvas>
+    </div>
 </div>
 <?php include 'footer.php' ?>
             

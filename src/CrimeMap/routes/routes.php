@@ -35,3 +35,11 @@ $app->get('/crimes/:category/:lat/:long', function($category, $lat, $long) use($
     }
 });
 
+
+$app->get('/visualise', function() use($app) {
+    $categories = $app->crimeModel->getCategories();
+    array_unshift($categories, array('crime_type' => 'All crime'));
+    
+    $app->render('visualise.php', array('categories' => $categories));
+});
+
