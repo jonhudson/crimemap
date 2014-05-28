@@ -66,9 +66,7 @@ $(document).ready(function() {
                     heatmap.set('radius', 40);
                     heatmap.setMap(map);
                     
-                } else {
-                    // do something here, innit
-                }                
+                }               
             }); 
         
         });        

@@ -35,6 +35,9 @@ $app->get('/crimes/:category/:lat/:long', function($category, $lat, $long) use($
     }
 });
 
+/**
+ * Routes for charts section
+ */
 
 $app->get('/visualise', function() use($app) {
     $categories = $app->crimeModel->getCategories();
@@ -43,3 +46,13 @@ $app->get('/visualise', function() use($app) {
     $app->render('visualise.php', array('categories' => $categories));
 });
 
+$app->get('/crimes-per-month/:category/:lat/:long', function($category, $lat, $long) use ($app) {
+    if ($app->request->isAjax()) {
+        $crimesPerMonth = $app->crimeModel->getCrimeNumbersPerMonth($category, $lat, $long);             
+              
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response->setBody(json_encode($crimesPerMonth));
+    } else {
+        $app->pass();
+    }
+});
