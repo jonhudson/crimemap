@@ -1,6 +1,6 @@
 <?php include 'header.php' ?>
 <div class="col-xs-3">
-    <form id="crimeform">
+    <form id="visualiseform">
         <div class="form-group">
             <label for="location">Enter location:</label>
             <input type="text" name="location" id="location" class="form-control"/>

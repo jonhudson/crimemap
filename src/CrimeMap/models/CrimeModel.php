@@ -71,21 +71,24 @@ class CrimeModel
     
     /**
      * Returns an array containing crime count for each month
-     * in each year.
+     * in each year, for a category
      * 
      * @param String $category
      * @param double $userLat
      * @param double $userLng
      * @return array crime count per month and year
      */
-    public function getCrimeNumbersPerMonth($category, $userLat, $userLng) {
-        
-        $sql = 'SELECT COUNT(id) AS count, ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
-                AS distance 
-                FROM crime 
-                WHERE crime_type like :category
-                AND WHERE month = :month
-                HAVING distance <= 1';  
+    public function getCrimeNumbersPerMonthInCat($category, $userLat, $userLng) {
+          
+        $sql = 'SELECT COUNT(*) AS count
+                FROM (
+                    SELECT ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
+                    AS distance
+                    FROM crime 
+                    WHERE crime_type like :category
+                    AND month = :month
+                    HAVING distance <= 1
+                ) AS crimes';
        
         $months = array(
             '01' => 0,
@@ -116,7 +119,63 @@ class CrimeModel
                     ':month' => $year . '-' . $month
                 );
 
-                $result = $this->db->fetchAll($sql, $params);
+                $result = $this->db->fetch($sql, $params);
+                $monthVal = $result['count'];
+            }
+            $yearVal = $months;
+        }
+        
+        return $years;
+    }    
+    
+    /**
+     * Returns an array containing crime count for each month
+     * in each year
+     * 
+     * @param double $userLat
+     * @param double $userLng
+     * @return array crime count per month and year
+     */
+    public function getCrimeNumbersPerMonth($userLat, $userLng) {
+        
+        $sql = 'SELECT COUNT(*) AS count
+                FROM (
+                    SELECT ( 3959 * acos( cos( radians(:userLat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * sin( radians( lat ) ) ) ) 
+                    AS distance
+                    FROM crime 
+                    WHERE month = :month
+                    HAVING distance <= 1
+                ) AS crimes';
+       
+        $months = array(
+            '01' => 0,
+            '02' => 0,
+            '03' => 0,
+            '04' => 0,
+            '05' => 0,
+            '06' => 0,
+            '07' => 0,
+            '08' => 0,
+            '09' => 0,
+            '10' => 0,
+            '11' => 0,
+            '12' => 0            
+        );
+        
+        $years = array(
+            '2012' => '',
+            '2013' => ''
+        );
+        
+        foreach ($years as $year => &$yearVal) {
+            foreach ($months as $month => &$monthVal) {
+                $params = array(
+                    ':userLat' => $userLat, 
+                    ':userLng' => $userLng,
+                    ':month' => $year . '-' . $month
+                );
+
+                $result = $this->db->fetch($sql, $params);
                 $monthVal = $result['count'];
             }
             $yearVal = $months;

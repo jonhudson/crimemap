@@ -46,12 +46,24 @@ $app->get('/visualise', function() use($app) {
     $app->render('visualise.php', array('categories' => $categories));
 });
 
-$app->get('/crimes-per-month/:category/:lat/:long', function($category, $lat, $long) use ($app) {
+
+$app->get('/crimes-per-month/:lat/:long', function($lat, $long) use ($app) {
     if ($app->request->isAjax()) {
-        $crimesPerMonth = $app->crimeModel->getCrimeNumbersPerMonth($category, $lat, $long);             
+        $crimesPerMonth = $app->crimeModel->getCrimeNumbersPerMonth($lat, $long);             
               
         $app->response->headers->set('Content-Type', 'application/json');
         $app->response->setBody(json_encode($crimesPerMonth));
+    } else {
+        $app->pass();
+    }
+});
+
+$app->get('/crimes-per-month/:category/:lat/:long', function($category, $lat, $long) use ($app) {
+    if ($app->request->isAjax()) {
+        $crimesPerMonthInCat = $app->crimeModel->getCrimeNumbersPerMonthInCat($category, $lat, $long);             
+              
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response->setBody(json_encode($crimesPerMonthInCat));
     } else {
         $app->pass();
     }
