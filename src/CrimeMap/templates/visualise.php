@@ -18,7 +18,7 @@
 </div>
 <div class="col-xs-9 height-100">
     <div id="graph-container" class="height-100">
-        <canvas id="line-chart" width="400" height="400"></canvas>
+        <canvas id="line-chart" width="600" height="400"></canvas>
     </div>
 </div>
 <?php include 'footer.php' ?>
