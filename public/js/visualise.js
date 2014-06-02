@@ -22,6 +22,13 @@ $(document).ready(function() {
                         labels : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                         datasets : [
                             {
+                                fillColor : "rgba(255,0,127,0.5)",
+                                strokeColor : "#679b00",
+                                pointColor : "#679b00",
+                                pointStrokeColor : "#fff",
+                                data : [data["2011"]["01"],data["2011"]["02"],data["2011"]["03"],data["2011"]["04"],data["2011"]["05"],data["2011"]["06"],data["2011"]["07"],data["2011"]["08"],data["2011"]["09"],data["2011"]["10"],data["2011"]["11"],data["2011"]["12"]]
+                            },
+                            {
                                 fillColor : "rgba(159,238,0,0.5)",
                                 strokeColor : "#679b00",
                                 pointColor : "#679b00",
