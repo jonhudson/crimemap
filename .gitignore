@@ -1,1 +1,3 @@
 src/CrimeMap/Config.php
+vendor/
+composer.lock

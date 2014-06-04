@@ -21,24 +21,19 @@ class CrimeModel
      */
     public function getCrimes($userLat, $userLng)
     {
-        $lng1 = $userLng - (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lng2 = $userLng + (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lat1 = $userLat - (0.5 / 69);
-        $lat2 = $userLat + (0.5 / 69);
-        
+        $coordinates = $this->getLatLngBoundary($userLat, $userLng);        
         $sql = 'SELECT * FROM crime 
                 WHERE lng BETWEEN :lng1 AND :lng2
                 AND lat BETWEEN :lat1 AND :lat2';
         
         $params = array(
-            ':lng1' => $lng1, 
-            ':lng2' => $lng2, 
-            ':lat1' => $lat1, 
-            ':lat2' => $lat2
+            ':lng1' => $coordinates['lng1'], 
+            ':lng2' => $coordinates['lng2'], 
+            ':lat1' => $coordinates['lat1'], 
+            ':lat2' => $coordinates['lat2']
         );        
         
-        return $this->db->fetchAll($sql, $params);
-               
+        return $this->db->fetchAll($sql, $params);               
     }
     
     /**
@@ -53,21 +48,17 @@ class CrimeModel
      */
     public function getCrimesInCategory($category, $userLat, $userLng)
     {
-        $lng1 = $userLng - (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lng2 = $userLng + (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lat1 = $userLat - (0.5 / 69);
-        $lat2 = $userLat + (0.5 / 69);
-        
+        $coordinates = $this->getLatLngBoundary($userLat, $userLng);        
         $sql = 'SELECT * FROM crime 
                 WHERE lng BETWEEN :lng1 AND :lng2
                 AND lat BETWEEN :lat1 AND :lat2
                 AND crime_type LIKE :category';
         
         $params = array(
-            ':lng1' => $lng1, 
-            ':lng2' => $lng2, 
-            ':lat1' => $lat1, 
-            ':lat2' => $lat2,
+            ':lng1' => $coordinates['lng1'], 
+            ':lng2' => $coordinates['lng2'], 
+            ':lat1' => $coordinates['lat1'], 
+            ':lat2' => $coordinates['lat2'],
             ':category' => '%' . $category . '%'
         );        
         
@@ -95,11 +86,7 @@ class CrimeModel
      */
     public function getCrimeNumbersPerMonthInCat($category, $userLat, $userLng) {
           
-        $lng1 = $userLng - (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lng2 = $userLng + (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lat1 = $userLat - (0.5 / 69);
-        $lat2 = $userLat + (0.5 / 69);
-        
+        $coordinates = $this->getLatLngBoundary($userLat, $userLng);        
         $sql = 'SELECT COUNT(*) AS count
                 FROM (
                     SELECT id FROM crime 
@@ -109,34 +96,16 @@ class CrimeModel
                     AND crime_type LIKE :category
                 ) AS crimes';     
        
-        $months = array(
-            '01' => 0,
-            '02' => 0,
-            '03' => 0,
-            '04' => 0,
-            '05' => 0,
-            '06' => 0,
-            '07' => 0,
-            '08' => 0,
-            '09' => 0,
-            '10' => 0,
-            '11' => 0,
-            '12' => 0            
-        );
-        
-        $years = array(
-            '2011' => array(),
-            '2012' => array(),
-            '2013' => array()
-        );
+        $years = $this->getYears();
+        $months = $this->getMonths();
         
         foreach ($years as $year => &$yearVal) {
             foreach ($months as $month => &$monthVal) {
                 $params = array(
-                    ':lng1' => $lng1, 
-                    ':lng2' => $lng2, 
-                    ':lat1' => $lat1, 
-                    ':lat2' => $lat2,
+                    ':lng1' => $coordinates['lng1'], 
+                    ':lng2' => $coordinates['lng2'], 
+                    ':lat1' => $coordinates['lat1'], 
+                    ':lat2' => $coordinates['lat2'],
                     ':month' => $year . '-' . $month,
                     ':category' => '%' . $category . '%'
                 );
@@ -160,11 +129,7 @@ class CrimeModel
      */
     public function getCrimeNumbersPerMonth($userLat, $userLng) {
         
-        $lng1 = $userLng - (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lng2 = $userLng + (0.5 / abs(cos(deg2rad($userLat)) * 69));
-        $lat1 = $userLat - (0.5 / 69);
-        $lat2 = $userLat + (0.5 / 69);
-        
+        $coordinates = $this->getLatLngBoundary($userLat, $userLng);         
         $sql = 'SELECT COUNT(*) AS count
                 FROM (
                     SELECT id FROM crime 
@@ -172,8 +137,49 @@ class CrimeModel
                     AND lat BETWEEN :lat1 AND :lat2
                     AND month = :month
                 ) AS crimes';     
-       
-        $months = array(
+        
+        $years = $this->getYears();
+        $months = $this->getMonths();
+        
+        foreach ($years as $year => &$yearVal) {
+            foreach ($months as $month => &$monthVal) {
+                $params = array(
+                    ':lng1' => $coordinates['lng1'], 
+                    ':lng2' => $coordinates['lng2'], 
+                    ':lat1' => $coordinates['lat1'], 
+                    ':lat2' => $coordinates['lat2'],
+                    ':month' => $year . '-' . $month
+                );
+
+                $result = $this->db->fetch($sql, $params);
+                $monthVal = $result['count'];
+            }
+            $yearVal = $months;
+        }
+        
+        return $years;
+    }   
+    
+     /**
+     * 
+     * @param type $userLat
+     * @param type $userLng
+     * @return array The boundary coordinates to search between
+     */
+    private function getLatLngBoundary($userLat, $userLng) 
+    {
+        $coordinates = array();
+        $coordinates['lng1'] = $userLng - (0.5 / abs(cos(deg2rad($userLat)) * 69));
+        $coordinates['lng2'] = $userLng + (0.5 / abs(cos(deg2rad($userLat)) * 69));
+        $coordinates['lat1'] = $userLat - (0.5 / 69);
+        $coordinates['lat2'] = $userLat + (0.5 / 69);
+        
+        return $coordinates;
+    }
+    
+    private function getMonths() 
+    {        
+        return $months = array(
             '01' => 0,
             '02' => 0,
             '03' => 0,
@@ -187,29 +193,14 @@ class CrimeModel
             '11' => 0,
             '12' => 0            
         );
-        
-        $years = array(
+    }
+    
+    private function getYears() 
+    {        
+        return $years = array(
             '2011' => array(),
             '2012' => array(),
             '2013' => array()
         );
-        
-        foreach ($years as $year => &$yearVal) {
-            foreach ($months as $month => &$monthVal) {
-                $params = array(
-                    ':lng1' => $lng1, 
-                    ':lng2' => $lng2, 
-                    ':lat1' => $lat1, 
-                    ':lat2' => $lat2,
-                    ':month' => $year . '-' . $month
-                );
-
-                $result = $this->db->fetch($sql, $params);
-                $monthVal = $result['count'];
-            }
-            $yearVal = $months;
-        }
-        
-        return $years;
-    }    
+    }
 }
