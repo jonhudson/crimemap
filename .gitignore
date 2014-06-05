@@ -1,3 +1,4 @@
-src/CrimeMap/Config.php
+src/Config.php
 vendor/
 composer.lock
+composer.phar

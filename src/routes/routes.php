@@ -50,9 +50,14 @@ $app->get('/visualise', function() use($app) {
 $app->get('/crimes-per-month/:lat/:long', function($lat, $long) use ($app) {
     if ($app->request->isAjax()) {
         $crimesPerMonth = $app->crimeModel->getCrimeNumbersPerMonth($lat, $long);             
-              
+        $percentageChange = $app->statsHelper->getPercentageChange(array_sum($crimesPerMonth['2011']), array_sum($crimesPerMonth['2013']));
+        
         $app->response->headers->set('Content-Type', 'application/json');
-        $app->response->setBody(json_encode($crimesPerMonth));
+        $app->response->setBody(json_encode(array(
+            'crimes' => $crimesPerMonth,
+            'change' => $percentageChange
+            )
+        ));
     } else {
         $app->pass();
     }
