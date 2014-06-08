@@ -2,10 +2,9 @@
 
 require '../vendor/autoload.php';
 
-use CrimeMap\lib\Database;
-use CrimeMap\Config;
 use CrimeMap\models\CrimeModel;
 use CrimeMap\lib\StatsHelper;
+use CrimeMap\lib\DBFactory;
 
 // Configure Slim
 $app = new Slim\Slim(array(
@@ -15,7 +14,7 @@ $app = new Slim\Slim(array(
 
 // Configure container
 $app->container->singleton('db', function () {
-    return new Database(Config::DB_HOST, Config::DB_NAME, Config::DB_USERNAME, Config::DB_PASSWORD);
+    return DBFactory::createDB('mysql');
 });
 
 $app->crimeModel = function() use ($app) {

@@ -2,7 +2,9 @@
 
 namespace CrimeMap\lib;
 
-class Database Extends \PDO 
+use CrimeMap\lib\DatabaseInterface;
+
+class MySQLDB Extends \PDO implements DatabaseInterface
 {
     public function __construct($host, $name, $username, $password)
     {
@@ -13,8 +15,7 @@ class Database Extends \PDO
         } catch (PDOException $e) {
             die('Could not connect to database' . $e);
         }
-    }   
-    
+    }       
     
     /**
      * Fetch a row
